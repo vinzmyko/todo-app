@@ -1,0 +1,59 @@
+# .NET Core/ASP.NET Core/.NET 5-8 .gitignore
+
+## Ignore build outputs
+bin/
+obj/
+
+# Ignore NuGet packages
+*.nupkg
+*.snupkg
+.nuget/
+
+# Ignore user-specific files
+*.user
+*.userosscache
+*.sln.docstates
+
+# Ignore Rider/JetBrains specific files
+.idea/
+*.suo
+*.userprefs
+
+# Ignore VS Code workspace and settings
+.vscode/
+
+# Ignore Visual Studio Code specific files
+.history/
+.vscode/
+
+# ASP.NET Scaffolding
+.scaffolding/
+
+# Ignore Web files for Blazor (Client-side/Server-side)
+dist/
+node_modules/
+npm-debug.log*
+yarn-error.log
+
+# .NET Project Specific
+project.lock.json
+project.fragment.lock.json
+
+# Ignore environment-specific files (for appsettings)
+appsettings*.Development.json
+appsettings*.Local.json
+
+# Ignore Publish output
+publish/
+
+# Blazor specific files
+wwwroot/css/
+wwwroot/js/
+wwwroot/dist/
+
+# Optional: Ignore logs
+*.log
+
+# Optional: ignore SQLite database (if using locally for dev)
+*.db
+*.sqlite
