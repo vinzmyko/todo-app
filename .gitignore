@@ -57,3 +57,12 @@ wwwroot/dist/
 # Optional: ignore SQLite database (if using locally for dev)
 *.db
 *.sqlite
+*.db-journal
+*.sqlite-journal
+# Vscode specific
+*.db-shm
+*.db-wal
+
+# EF Core design-time files
+*.dtbcache
+*.dtbcache.v2
