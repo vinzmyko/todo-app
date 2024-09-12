@@ -1,0 +1,29 @@
+@baseUrl = http://localhost:5183
+
+### Get all users
+GET {{baseUrl}}/users
+
+### Get a specific user by ID
+GET {{baseUrl}}/users/1
+
+### Create a new user
+POST {{baseUrl}}/users
+Content-Type: application/json
+
+{
+  "username": "vinz"
+}
+
+### Update an existing user
+PUT {{baseUrl}}/users/3
+Content-Type: application/json
+
+{
+  "username": "vinzmyko"
+}
+
+### Delete a user
+DELETE {{baseUrl}}/users/4
+
+### Reset the database (for development only)
+POST {{baseUrl}}/users/reset
