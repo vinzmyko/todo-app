@@ -87,6 +87,7 @@ public static class UserEndpoints
             return Results.NoContent();
         });
 
+        // RESET /users/reset
         #if DEBUG
         group.MapPost("/reset", async (TodoAppDbContext dbContext) =>
         {

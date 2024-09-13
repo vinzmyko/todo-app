@@ -15,7 +15,7 @@ Content-Type: application/json
 }
 
 ### Update an existing user
-PUT {{baseUrl}}/users/3
+PUT {{baseUrl}}/users/1
 Content-Type: application/json
 
 {
@@ -23,7 +23,7 @@ Content-Type: application/json
 }
 
 ### Delete a user
-DELETE {{baseUrl}}/users/4
+DELETE {{baseUrl}}/users/1
 
 ### Reset the database (for development only)
 POST {{baseUrl}}/users/reset
