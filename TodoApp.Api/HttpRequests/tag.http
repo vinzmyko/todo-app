@@ -1,0 +1,30 @@
+
+@baseUrl = http://localhost:5183
+
+### Get all tags
+GET {{baseUrl}}/tags
+
+### Get a specific tag by ID
+GET {{baseUrl}}/tags/1
+
+### Create a new tag
+POST {{baseUrl}}/tags
+Content-Type: application/json
+
+{
+  "name": "january"
+}
+
+### Update an existing tag
+PUT {{baseUrl}}/tags/6
+Content-Type: application/json
+
+{
+  "name": "february"
+}
+
+### Delete a tag
+DELETE {{baseUrl}}/tags/6
+
+### Reset the database (for development only)
+POST {{baseUrl}}/tags/reset

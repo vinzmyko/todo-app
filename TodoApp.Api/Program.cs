@@ -9,6 +9,7 @@ builder.Services.AddSqlite<TodoAppDbContext>(connectionString);
 var app = builder.Build();
 
 app.MapUserEndpoints();
+app.MapTagEndpoints();
 
 app.MigrateDb();
 
