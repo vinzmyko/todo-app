@@ -12,6 +12,6 @@ app.MapUserEndpoints();
 app.MapTagEndpoints();
 app.MapTodoEndpoints();
 
-app.MigrateDb();
+await app.MigrateDbAsync();
 
 app.Run();
