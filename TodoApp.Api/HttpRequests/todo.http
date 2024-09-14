@@ -1,0 +1,41 @@
+@baseUrl = http://localhost:5183
+
+### Reset todos (DEBUG only)
+POST {{baseUrl}}/todos/reset
+
+### Get all todos (summary)
+GET {{baseUrl}}/todos
+
+### Get todos for a specific user
+GET {{baseUrl}}/todos/user/1
+
+### Get a specific todo (detailed)
+GET {{baseUrl}}/todos/1
+
+### Create a new todo
+POST {{baseUrl}}/todos
+Content-Type: application/json
+
+{
+    "title": "Complete API project",
+    "description": "Finish implementing the Todo API endpoints",
+    "dueDate": "2023-06-30T23:59:59Z",
+    "todoTimeFrame": 2,
+    "userId": 1,
+    "tagIds": [1, 3]
+}
+
+### Update a todo
+PUT {{baseUrl}}/todos/1
+Content-Type: application/json
+
+{
+    "title": "Updated: Complete API project",
+    "description": "Finish implementing and testing the Todo API endpoints",
+    "dueDate": "2023-07-05T23:59:59Z",
+    "todoTimeFrame": 2,
+    "tagIds": [1, 2, 3]
+}
+
+### Delete a todo
+DELETE {{baseUrl}}/todos/1

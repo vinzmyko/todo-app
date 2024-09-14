@@ -10,6 +10,7 @@ var app = builder.Build();
 
 app.MapUserEndpoints();
 app.MapTagEndpoints();
+app.MapTodoEndpoints();
 
 app.MigrateDb();
 
