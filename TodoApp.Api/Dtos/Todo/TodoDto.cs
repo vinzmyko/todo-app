@@ -13,5 +13,7 @@ public record class TodoDto(
     DateTime? CompletedAt,
     DateTime? DueDate,
     [Required]Timeframe TodoTimeFrame,
-    List<TagDto> Tags
+    int UserId,
+    string UserName,
+    IEnumerable<TagDto> Tags
 );

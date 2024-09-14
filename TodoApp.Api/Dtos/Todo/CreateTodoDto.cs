@@ -8,5 +8,6 @@ public record class CreateTodoDto(
     [Required][StringLength(1000)]string Description,
     DateTime? DueDate,
     [Required]Timeframe TodoTimeFrame,
-    List<int> TagIds
+    [Required]int UserId,
+    IEnumerable<int> TagIds
 );

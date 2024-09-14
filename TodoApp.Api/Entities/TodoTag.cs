@@ -1,13 +1,10 @@
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
 namespace TodoApp.Api.Entities;
 
 public class TodoTag
 {
-    // Composite Key
     public int TodoId { get; set; }
+    public Todo Todo { get; set; } = null!;
+
     public int TagId { get; set; }
-    [ForeignKey("TodoId")] public required Todo Todo { get; set; }
-    [ForeignKey("TagId")] public required Tag Tag { get; set; }
+    public Tag Tag { get; set; } = null!;
 }
