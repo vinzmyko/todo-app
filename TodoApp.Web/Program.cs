@@ -42,7 +42,13 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddHttpClient<UsersClient>(client => 
 {
-    logger.LogInformation($"Configuring HttpClient with BaseAddress: {todoAppApiUrl}");
+    logger.LogInformation($"Configuring UsersHttpClient with BaseAddress: {todoAppApiUrl}");
+    client.BaseAddress = new Uri(todoAppApiUrl);
+});
+
+builder.Services.AddHttpClient<TagsClient>(client => 
+{
+    logger.LogInformation($"Configuring TagsHttpClient with BaseAddress: {todoAppApiUrl}");
     client.BaseAddress = new Uri(todoAppApiUrl);
 });
 
