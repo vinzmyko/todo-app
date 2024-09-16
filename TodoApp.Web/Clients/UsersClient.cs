@@ -1,5 +1,4 @@
-﻿using System.Net.Http.Json;
-using TodoApp.Web.Models;
+﻿using TodoApp.Web.Models;
 
 namespace TodoApp.Web.Clients;
 
