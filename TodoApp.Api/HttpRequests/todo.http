@@ -1,13 +1,13 @@
 @baseUrl = http://localhost:5183
 
+### Get all todos for the current user (This is what GetAllTodosAsync() should be calling)
+GET {{baseUrl}}/todos/user/1
+
 ### Reset todos (DEBUG only)
 POST {{baseUrl}}/todos/reset
 
 ### Get all todos (summary)
 GET {{baseUrl}}/todos
-
-### Get todos for a specific user
-GET {{baseUrl}}/todos/user/1
 
 ### Get a specific todo (detailed)
 GET {{baseUrl}}/todos/1
@@ -17,12 +17,12 @@ POST {{baseUrl}}/todos
 Content-Type: application/json
 
 {
-    "title": "Complete API project",
-    "description": "Finish implementing the Todo API endpoints",
-    "dueDate": "2023-06-30T23:59:59Z",
+    "title": "Test new todo",
+    "description": "This is a test todo created via HTTP request",
+    "dueDate": "2024-12-31T23:59:59Z",
     "todoTimeFrame": 2,
     "userId": 1,
-    "tagIds": [1, 3]
+    "tagIds": [1, 2]
 }
 
 ### Update a todo
@@ -30,9 +30,9 @@ PUT {{baseUrl}}/todos/1
 Content-Type: application/json
 
 {
-    "title": "Updated: Complete API project",
-    "description": "Finish implementing and testing the Todo API endpoints",
-    "dueDate": "2023-07-05T23:59:59Z",
+    "title": "Updated: Test new todo",
+    "description": "This todo has been updated via HTTP request",
+    "dueDate": "2024-12-31T23:59:59Z",
     "todoTimeFrame": 2,
     "tagIds": [1, 2, 3]
 }
