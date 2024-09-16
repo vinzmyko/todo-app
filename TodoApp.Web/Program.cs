@@ -52,6 +52,12 @@ builder.Services.AddHttpClient<TagsClient>(client =>
     client.BaseAddress = new Uri(todoAppApiUrl);
 });
 
+builder.Services.AddHttpClient<TodosClient>(client => 
+{
+    logger.LogInformation($"Configuring TagsHttpClient with BaseAddress: {todoAppApiUrl}");
+    client.BaseAddress = new Uri(todoAppApiUrl);
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
