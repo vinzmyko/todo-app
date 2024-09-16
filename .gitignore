@@ -66,3 +66,10 @@ wwwroot/dist/
 # EF Core design-time files
 *.dtbcache
 *.dtbcache.v2
+
+# Tailwind CSS
+tailwindcss.exe
+node_modules/
+
+# Generated CSS (optional, if you want to regenerate it on each build)
+wwwroot/css/app.css
