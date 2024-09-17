@@ -7,7 +7,13 @@ module.exports = {
     './wwwroot/**/*.html',
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        primary: ['Oswald', 'sans-serif'],
+        secondary: ['Lato', 'sans-serif'],
+        accent: ['Raleway', 'sans-serif'],
+      },
+    },
   },
   plugins: [
     require('@tailwindcss/forms'),
