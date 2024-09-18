@@ -8,5 +8,7 @@ public record UpdateTodoDto(
     [Required][StringLength(1000)] string Description,
     DateTime? DueDate,
     [Required] Timeframe TodoTimeFrame,
-    IEnumerable<int> TagIds
+    IEnumerable<int> TagIds,
+    string UserTimeZone,
+    int UserOffset
 );

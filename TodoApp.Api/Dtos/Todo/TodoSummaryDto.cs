@@ -1,4 +1,5 @@
-﻿using TodoApp.Api.Entities;
+﻿using TodoApp.Api.Dtos.Tag;
+using TodoApp.Api.Entities;
 
 namespace TodoApp.Api.Dtos.Todo;
 
@@ -7,5 +8,6 @@ public record TodoSummaryDto(
     string Title,
     bool IsCompleted,
     DateTime? DueDate,
-    Timeframe TodoTimeFrame
+    Timeframe TodoTimeFrame,
+    IEnumerable<TagDto> Tags
 );

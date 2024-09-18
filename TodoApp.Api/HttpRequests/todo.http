@@ -12,18 +12,21 @@ GET {{baseUrl}}/todos
 ### Get a specific todo (detailed)
 GET {{baseUrl}}/todos/1
 
-### Create a new todo
+### Create a new todo, change "userLocalTime" to the time you are currently at
 POST {{baseUrl}}/todos
 Content-Type: application/json
 
 {
-    "title": "Test new todo",
+    "title": "Test",
     "description": "This is a test todo created via HTTP request",
-    "dueDate": "2024-12-31T23:59:59Z",
-    "todoTimeFrame": 2,
+    "dueDate": "2024-09-24T23:59:59Z",
     "userId": 1,
-    "tagIds": [1, 2]
+    "tagIds": [3],
+    "userTimeZone": "Europe/London",
+    "userTimeOffsetMinutes": 0,
+    "userLocalTime": "2024-09-18T12:00:00"
 }
+
 
 ### Update a todo
 PUT {{baseUrl}}/todos/1
@@ -33,8 +36,9 @@ Content-Type: application/json
     "title": "Updated: Test new todo",
     "description": "This todo has been updated via HTTP request",
     "dueDate": "2024-12-31T23:59:59Z",
-    "todoTimeFrame": 2,
-    "tagIds": [1, 2, 3]
+    "tagIds": [1, 2, 3],
+    "userTimeZone": "Europe/London",
+    "userOffset": 0
 }
 
 ### Delete a todo

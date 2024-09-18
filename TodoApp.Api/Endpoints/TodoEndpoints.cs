@@ -2,6 +2,7 @@
 using TodoApp.Api.Dtos.Todo;
 using TodoApp.Api.Mapping;
 using Microsoft.EntityFrameworkCore;
+using TodoApp.Api.Entities;
 
 namespace TodoApp.Api.Endpoints;
 
@@ -17,9 +18,11 @@ public static class TodoEndpoints
         // GET /todos (summary list)
         group.MapGet("/", async (TodoAppDbContext dbContext) =>
             await dbContext.Todos
-                           .AsNoTracking()
-                           .Select(todo => todo.ToTodoSummaryDto())
-                           .ToListAsync());
+                        .AsNoTracking()
+                        .Include(t => t.TodoTags)
+                        .ThenInclude(tt => tt.Tag)
+                        .Select(todo => todo.ToTodoSummaryDto())
+                        .ToListAsync());
 
         // GET /todos/{id} (detailed view)
         group.MapGet("/{id}", async (int id, TodoAppDbContext dbContext) =>
@@ -44,10 +47,13 @@ public static class TodoEndpoints
             }
 
             var tags = await dbContext.Tags
-                                      .Where(t => newTodo.TagIds.Contains(t.Id))
-                                      .ToListAsync();
+                                    .Where(t => newTodo.TagIds.Contains(t.Id))
+                                    .ToListAsync();
 
             var todo = newTodo.ToEntity(user, tags);
+            
+            // Automatically calculate and set the TimeFrame
+            todo.TodoTimeFrame = CalculateTimeFrame(todo.DueDate, newTodo.UserTimeZone, newTodo.UserTimeOffsetMinutes);
 
             dbContext.Todos.Add(todo);
             await dbContext.SaveChangesAsync();
@@ -61,8 +67,8 @@ public static class TodoEndpoints
         group.MapPut("/{id}", async (int id, UpdateTodoDto updatedTodo, TodoAppDbContext dbContext) =>
         {
             var existingTodo = await dbContext.Todos
-                                              .Include(t => t.TodoTags)
-                                              .FirstOrDefaultAsync(t => t.Id == id);
+                                            .Include(t => t.TodoTags)
+                                            .FirstOrDefaultAsync(t => t.Id == id);
             
             if (existingTodo is null)
             {
@@ -70,10 +76,13 @@ public static class TodoEndpoints
             }
 
             var tags = await dbContext.Tags
-                                      .Where(t => updatedTodo.TagIds.Contains(t.Id))
-                                      .ToListAsync();
+                                    .Where(t => updatedTodo.TagIds.Contains(t.Id))
+                                    .ToListAsync();
 
             existingTodo.UpdateEntityFromDto(updatedTodo, tags);
+
+            // Recalculate TimeFrame
+            existingTodo.TodoTimeFrame = CalculateTimeFrame(existingTodo.DueDate, updatedTodo.UserTimeZone, updatedTodo.UserOffset);
 
             await dbContext.SaveChangesAsync();
 
@@ -95,13 +104,16 @@ public static class TodoEndpoints
             return Results.NoContent();
         });
 
-        // GET /todos/user/{userId} (get todos for a specific user)
+        // GET /todos/user/{userId} (summary list for a user)
         group.MapGet("/user/{userId}", async (int userId, TodoAppDbContext dbContext) =>
             await dbContext.Todos
-                           .Where(t => t.UserId == userId)
-                           .AsNoTracking()
-                           .Select(todo => todo.ToTodoSummaryDto())
-                           .ToListAsync());
+                        .AsNoTracking()
+                        .Where(t => t.UserId == userId)
+                        .Include(t => t.TodoTags)
+                        .ThenInclude(tt => tt.Tag)
+                        .Select(todo => todo.ToTodoSummaryDto())
+                        .ToListAsync());
+
 
         // RESET /todos/reset
         #if DEBUG
@@ -114,5 +126,36 @@ public static class TodoEndpoints
         #endif
 
         return group;
+    }
+
+    private static Timeframe CalculateTimeFrame(DateTime? dueDate, string userTimeZone, int userOffset)
+    {
+        if (!dueDate.HasValue)
+            return Timeframe.Future;
+
+        TimeZoneInfo userTz;
+        try
+        {
+            userTz = TimeZoneInfo.FindSystemTimeZoneById(userTimeZone);
+        }
+        catch
+        {
+            // Fallback to creating a custom offset if the time zone isn't recognized
+            userTz = TimeZoneInfo.CreateCustomTimeZone(
+                "User_Time_Zone", 
+                TimeSpan.FromMinutes(-userOffset), 
+                "User Time Zone",
+                "User Time Zone");
+        }
+
+        var userNow = TimeZoneInfo.ConvertTime(DateTime.UtcNow, userTz);
+        var daysUntilDue = (dueDate.Value.Date - userNow.Date).Days;
+
+        return daysUntilDue switch
+        {
+            0 => Timeframe.Today,
+            <= 7 => Timeframe.NextSevenDays,
+            _ => Timeframe.Future
+        };
     }
 }

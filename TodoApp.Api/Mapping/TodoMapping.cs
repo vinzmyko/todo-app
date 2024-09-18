@@ -8,14 +8,28 @@ public static class TodoMapping
 {
     public static Todo ToEntity(this CreateTodoDto todoDto, User user, IEnumerable<Tag> tags)
     {
+        TimeZoneInfo userTz;
+        try
+        {
+            userTz = TimeZoneInfo.FindSystemTimeZoneById(todoDto.UserTimeZone);
+        }
+        catch
+        {
+            // Fallback to creating a custom offset if the time zone isn't recognized
+            userTz = TimeZoneInfo.CreateCustomTimeZone(
+                "User_Time_Zone", 
+                TimeSpan.FromMinutes(-todoDto.UserTimeOffsetMinutes), 
+                "User Time Zone",
+                "User Time Zone");
+        }
+
         var todo = new Todo
         {
             Title = todoDto.Title,
             Description = todoDto.Description,
             DueDate = todoDto.DueDate,
-            TodoTimeFrame = todoDto.TodoTimeFrame,
             User = user,
-            CreatedAt = DateTime.UtcNow
+            CreatedAt = TimeZoneInfo.ConvertTimeToUtc(todoDto.UserLocalTime, userTz)
         };
 
         foreach (var tag in tags)
@@ -65,7 +79,8 @@ public static class TodoMapping
             todo.Title,
             todo.IsCompleted,
             todo.DueDate,
-            todo.TodoTimeFrame
+            todo.TodoTimeFrame,
+            todo.TodoTags.Select(tt => new TagDto(tt.Tag.Id, tt.Tag.Name))
         );
     }
 }
