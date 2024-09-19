@@ -58,6 +58,7 @@ builder.Services.AddHttpClient<TodosClient>(client =>
 });
 
 builder.Services.AddScoped<TodoStateService>();
+builder.Services.AddScoped<UserService>();
 
 var app = builder.Build();
 

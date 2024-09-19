@@ -1,25 +1,29 @@
 ﻿using TodoApp.Web.Models;
+using TodoApp.Web.Services;
 
 namespace TodoApp.Web.Clients;
 
 public class TodosClient
 {
     private readonly HttpClient _httpClient;
-    private int _currentUserId;
+    private readonly UserService _userService;
 
-    public TodosClient(HttpClient httpClient)
+    public TodosClient(HttpClient httpClient, UserService userService)
     {
         _httpClient = httpClient;
-    }
-
-    public void SetCurrentUser(int userId)
-    {
-        _currentUserId = userId;
+        _userService = userService;
     }
 
     // GET all todos for the current user (summary)
     public async Task<TodoSummaryDto[]> GetAllTodosAsync()
-        => await _httpClient.GetFromJsonAsync<TodoSummaryDto[]>($"todos/user/{_currentUserId}") ?? [];
+    {
+        if (!_userService.IsLoggedIn)
+        {
+            return Array.Empty<TodoSummaryDto>();
+        }
+        return await _httpClient.GetFromJsonAsync<TodoSummaryDto[]>($"todos/user/{_userService.CurrentUser!.Id}") ?? [];
+    }
+
 
     // GET a specific todo (detailed)
     public async Task<TodoDto> GetTodoAsync(int id)
@@ -29,7 +33,7 @@ public class TodosClient
     // POST a new todo for the current user
     public async Task<TodoDto> CreateTodoAsync(CreateTodoDto todo)
     {
-        todo.UserId = _currentUserId;
+        todo.UserId = _userService.CurrentUser!.Id;
         var response = await _httpClient.PostAsJsonAsync("todos", todo);
         response.EnsureSuccessStatusCode();
         return await response.Content.ReadFromJsonAsync<TodoDto>()
