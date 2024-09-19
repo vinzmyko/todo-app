@@ -1,7 +1,6 @@
 using TodoApp.Web.Components;
 using TodoApp.Web.Clients;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
+using TodoApp.Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -57,6 +56,8 @@ builder.Services.AddHttpClient<TodosClient>(client =>
     logger.LogInformation($"Configuring TagsHttpClient with BaseAddress: {todoAppApiUrl}");
     client.BaseAddress = new Uri(todoAppApiUrl);
 });
+
+builder.Services.AddScoped<TodoStateService>();
 
 var app = builder.Build();
 
