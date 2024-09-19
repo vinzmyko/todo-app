@@ -1,0 +1,32 @@
+﻿@inject TodoStateService TodoState
+
+<div class="mb-6">
+    <h3 class="text-xl font-primary font-medium mb-2 uppercase">Timeframe</h3>
+    <div class="flex flex-col space-y-2">
+        @foreach (var timeframe in TodoState.TimeFrameCounts.Keys)
+        {
+            <button
+                @onclick="@(() => OnTimeframeChanged(timeframe))"
+                class="flex items-center justify-between w-full cursor-pointer px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200
+                       focus:outline-none
+                       @(TodoState.SelectedTimeframe == timeframe 
+                           ? "bg-blue-500 text-white" 
+                           : "bg-gray-200 text-gray-700 hover:bg-gray-300")">
+                <span>@timeframe</span>
+                <span class="bg-opacity-20 bg-black px-2 py-1 rounded-full text-xs inline-block text-center" style="min-width: 1.5rem;">
+                    @TodoState.TimeFrameCounts[timeframe]
+                </span>
+            </button>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter] public EventCallback<string> OnTimeframeChange { get; set; }
+
+    private async Task OnTimeframeChanged(string timeframe)
+    {
+        await TodoState.SetTimeframeAsync(timeframe);
+        await OnTimeframeChange.InvokeAsync(timeframe);
+    }
+}

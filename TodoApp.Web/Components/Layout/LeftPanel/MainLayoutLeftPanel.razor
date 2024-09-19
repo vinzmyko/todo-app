@@ -1,0 +1,48 @@
+﻿@rendermode InteractiveServer
+@using Microsoft.Extensions.Logging
+@inject TodosClient TodosClient
+@inject TagsClient TagsClient
+@inject TodoStateService TodoState
+@inject ILogger<MainLayoutLeftPanel> Logger
+
+<div class="bg-gray-100 p-4 w-64 h-full flex flex-col">
+    <TimeframeFilter OnTimeframeChange="OnTimeframeChanged" />
+    <ActiveTagsFilter OnTagToggle="OnTagToggled" />
+    <TodoViewFilter OnViewToggle="OnViewToggled" />
+</div>
+
+@code 
+{
+    protected override void OnInitialized()
+    {
+        TodoState.OnChange += StateHasChanged;
+        Logger.LogInformation("MainLayoutLeftPanel initialized");
+    }
+
+    private async Task OnTimeframeChanged(string timeframe)
+    {
+        Logger.LogInformation("Timeframe changed to {Timeframe}", timeframe);
+        StateHasChanged();
+        await Task.CompletedTask;
+    }
+
+    private async Task OnTagToggled(string tag)
+    {
+        Logger.LogInformation("Tag {Tag} toggled", tag);
+        StateHasChanged();
+        await Task.CompletedTask;
+    }
+
+    private async Task OnViewToggled(string view)
+    {
+        Logger.LogInformation("View changed to {View}", view);
+        StateHasChanged();
+        await Task.CompletedTask;
+    }
+
+    public void Dispose()
+    {
+        TodoState.OnChange -= StateHasChanged;
+        Logger.LogInformation("MainLayoutLeftPanel disposed");
+    }
+}

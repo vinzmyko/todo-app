@@ -1,0 +1,46 @@
+﻿@inject TodoStateService TodoState
+
+<div class="mt-auto">
+    <h3 class="text-xl font-primary font-medium mb-2 uppercase">Views</h3>
+    <div class="flex flex-col space-y-2">
+        @foreach (var view in new[] { "duedate", "completed", "overdue" })
+        {
+            <button
+                @onclick="@(() => OnViewToggled(view))"
+                class="flex items-center justify-between w-full cursor-pointer px-4 py-3 rounded-md text-sm font-medium transition-colors duration-200
+                       focus:outline-none
+                       @(TodoState.CurrentView == view
+                           ? "bg-blue-500 text-white hover:bg-blue-600" 
+                           : "bg-gray-200 text-gray-700 hover:bg-gray-300")">
+                <span>@view</span>
+                @if (view == "duedate")
+                {
+                    @if (TodoState.IsDueDateAscending)
+                    {
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" 
+                             class="w-5 h-5 @(TodoState.CurrentView == "duedate" ? "stroke-white" : "stroke-gray-500")">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 10.5L12 3m0 0l7.5 7.5M12 3v18" />
+                        </svg>
+                    }
+                    else
+                    {
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" 
+                             class="w-5 h-5 @(TodoState.CurrentView == "duedate" ? "stroke-white" : "stroke-gray-500")">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5L12 21m0 0l-7.5-7.5M12 21V3" />
+                        </svg>
+                    }
+                }
+            </button>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter] public EventCallback<string> OnViewToggle { get; set; }
+
+    private async Task OnViewToggled(string view)
+    {
+        await TodoState.ToggleViewAsync(view);
+        await OnViewToggle.InvokeAsync(view);
+    }
+}

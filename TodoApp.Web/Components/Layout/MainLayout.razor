@@ -1,8 +1,21 @@
-﻿@inherits LayoutComponentBase
+﻿@using TodoApp.Web.Components.Layout.LeftPanel
+@inherits LayoutComponentBase
 
-@Body
+<div class="flex h-screen">
+    <div class="w-64 bg-gray-100 p-4 flex flex-col justify-between">
+        @* <div>
+            <TimeframeFilter />
+            <ActiveTagsFilter />
+        </div>
+        <TodoViewFilter /> *@
+        <MainLayoutLeftPanel />
+    </div>
+    <main class="flex-1 p-4 overflow-auto">
+        @Body
+    </main>
+</div>
 
-<div id="blazor-error-ui">
+<div id="blazor-error-ui" class="fixed bottom-0 w-full">
     An unhandled error has occurred.
     <a href="" class="reload">Reload</a>
     <a class="dismiss">🗙</a>
