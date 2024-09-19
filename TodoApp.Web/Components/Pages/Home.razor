@@ -1,7 +1,95 @@
 ﻿@page "/"
+@rendermode InteractiveServer
+@inject TodosClient TodosClient
+@inject TodoStateService TodoState
+@inject ILogger<Home> Logger
+@implements IDisposable
 
-<PageTitle>Home</PageTitle>
+<div class="container mx-auto px-4">
+    <h1 class="text-3xl font-bold mb-6">Todo App Dashboard</h1>
 
-<h1>Hello, world!</h1>
+    @if (filteredTodos == null)
+    {
+        <p class="text-gray-600">Loading todos...</p>
+    }
+    else if (!filteredTodos.Any())
+    {
+        <p class="text-gray-600">No todos found.</p>
+    }
+    else
+    {
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            @foreach (var todo in filteredTodos)
+            {
+                <TodoSummaryComponent Todo="todo" />
+            }
+        </div>
+    }
+</div>
 
-Welcome to your new app.
+@code 
+{
+    private TodoSummaryDto[]? todos;
+    private TodoSummaryDto[]? filteredTodos;
+
+    protected override async Task OnInitializedAsync()
+    {
+        TodosClient.SetCurrentUser(1);
+        todos = await TodosClient.GetAllTodosAsync();
+        TodoState.UpdateTodos(todos);
+        TodoState.OnChange += StateHasChanged;
+        TodoState.OnFilterChange += ApplyFilters;
+        await ApplyFilters();
+    }
+
+    private Task ApplyFilters()
+    {
+        Logger.LogInformation("ApplyFilters called");
+        Logger.LogInformation("Current SelectedTag: {SelectedTag}", TodoState.SelectedTag);
+        
+        filteredTodos = todos;
+
+        // Apply timeframe filter
+        filteredTodos = TodoState.SelectedTimeframe switch
+        {
+            "today" => filteredTodos?.Where(t => t.TodoTimeFrame == TimeFrame.Today).ToArray(),
+            "next7days" => filteredTodos?.Where(t => t.TodoTimeFrame == TimeFrame.NextSevenDays).ToArray(),
+            "future" => filteredTodos?.Where(t => t.TodoTimeFrame == TimeFrame.Future).ToArray(),
+            _ => filteredTodos
+        };
+
+        // Apply tag filter
+        if (!string.IsNullOrEmpty(TodoState.SelectedTag))
+        {
+            filteredTodos = filteredTodos?.Where(t => t.Tags != null && t.Tags.Any(tag => tag.Name == TodoState.SelectedTag)).ToArray();
+        }
+
+        // Apply view filter
+        if (TodoState.CurrentView == "completed")
+        {
+            filteredTodos = filteredTodos?.Where(t => t.IsCompleted).ToArray();
+        }
+        else if (TodoState.CurrentView == "overdue")
+        {
+            filteredTodos = filteredTodos?.Where(t => t.DueDate < DateTime.Today && !t.IsCompleted).ToArray();
+        }
+        
+        // Always apply due date ordering if it's the current view
+        if (TodoState.CurrentView == "duedate")
+        {
+            filteredTodos = TodoState.IsDueDateAscending
+                ? filteredTodos?.OrderBy(t => t.DueDate).ToArray()
+                : filteredTodos?.OrderByDescending(t => t.DueDate).ToArray();
+        }
+
+        Logger.LogInformation($"Filtered todos count: {filteredTodos?.Length ?? 0}");
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
+    public void Dispose()
+    {
+        TodoState.OnChange -= StateHasChanged;
+        TodoState.OnFilterChange -= ApplyFilters;
+    }
+}

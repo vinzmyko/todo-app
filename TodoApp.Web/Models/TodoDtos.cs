@@ -42,6 +42,7 @@ public class UpdateTodoDto
 
 public class TodoSummaryDto
 {
+    public int Id { get; set; }
     [Required] [StringLength(100, MinimumLength = 5)] public required string Title { get; set; }
     public bool IsCompleted { get; set; }
     public DateTime? DueDate { get; set; }
