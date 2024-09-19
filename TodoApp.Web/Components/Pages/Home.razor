@@ -1,13 +1,15 @@
 ﻿@page "/"
 @rendermode InteractiveServer
+
+@using TodoApp.Web.Components.Modals
+
 @inject TodosClient TodosClient
 @inject TodoStateService TodoState
+@inject UserService UserService
 @inject ILogger<Home> Logger
 @implements IDisposable
 
 <div class="container mx-auto px-4">
-    <h1 class="text-3xl font-bold mb-6">Todo App Dashboard</h1>
-
     @if (filteredTodos == null)
     {
         <p class="text-gray-600">Loading todos...</p>
@@ -27,19 +29,52 @@
     }
 </div>
 
+<WelcomeModal @bind-IsVisible="isWelcomeModalVisible" OnLoginSuccess="RefreshTodos" />
+
 @code 
 {
     private TodoSummaryDto[]? todos;
     private TodoSummaryDto[]? filteredTodos;
+    private bool isWelcomeModalVisible = false;
 
     protected override async Task OnInitializedAsync()
     {
-        TodosClient.SetCurrentUser(1);
-        todos = await TodosClient.GetAllTodosAsync();
-        TodoState.UpdateTodos(todos);
+        UserService.OnUserStateChanged += HandleUserStateChanged;
+        await RefreshTodos();
         TodoState.OnChange += StateHasChanged;
         TodoState.OnFilterChange += ApplyFilters;
-        await ApplyFilters();
+    }
+
+    private async Task RefreshTodos()
+    {
+        if (UserService.IsLoggedIn)
+        {
+            todos = await TodosClient.GetAllTodosAsync();
+            TodoState.UpdateTodos(todos);
+            await ApplyFilters();
+            isWelcomeModalVisible = false;
+        }
+        else
+        {
+            ResetTodos();
+            isWelcomeModalVisible = true;
+        }
+        StateHasChanged();
+    }
+
+
+    private void ResetTodos()
+    {
+        todos = null;
+        filteredTodos = null;
+        TodoState.UpdateTodos(null);
+    }
+
+
+    private async void HandleUserStateChanged()
+    {
+        await RefreshTodos();
+        StateHasChanged();
     }
 
     private Task ApplyFilters()
@@ -86,7 +121,6 @@
         StateHasChanged();
         return Task.CompletedTask;
     }
-
     public void Dispose()
     {
         TodoState.OnChange -= StateHasChanged;
