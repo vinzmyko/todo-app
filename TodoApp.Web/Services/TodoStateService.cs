@@ -22,11 +22,35 @@ public class TodoStateService
     public string? CurrentView { get; private set; }
     public bool IsDueDateAscending { get; private set; } = true;
 
-    public void UpdateTodos(TodoSummaryDto[] todos)
+    public void UpdateTodos(TodoSummaryDto[]? todos)
     {
-        UpdateTimeFrameCounts(todos);
-        UpdateTagCounts(todos);
-        NotifyStateChanged();
+        if (todos == null || todos.Length == 0)
+        {
+            ResetState();
+        }
+        else
+        {
+            UpdateTimeFrameCounts(todos);
+            UpdateTagCounts(todos);
+        }
+
+        OnChange?.Invoke();
+    }
+
+    private void ResetState()
+    {
+        TimeFrameCounts = new Dictionary<string, int>
+        {
+            { "all", 0 },
+            { "today", 0 },
+            { "next7days", 0 },
+            { "future", 0 }
+        };
+        TagCounts = new Dictionary<string, int>();
+        ActiveTags = new List<string>();
+        SelectedTag = null;
+        CurrentView = null;
+        IsDueDateAscending = true;
     }
 
     private void UpdateTimeFrameCounts(TodoSummaryDto[] todos)
@@ -58,7 +82,7 @@ public class TodoStateService
                     }
                     else
                     {
-                        TagCounts[tag.Name]++;
+        TagCounts[tag.Name]++;
                     }
                 }
             }
