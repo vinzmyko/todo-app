@@ -1,0 +1,68 @@
+﻿@using TodoApp.Web.Components.Modals
+@rendermode InteractiveServer
+@inject UserService UserService
+@implements IDisposable
+
+<div class="flex items-center justify-between bg-white shadow-sm h-16">
+    <div class="w-4/5 flex items-center justify-between pr-4">
+        <div class="flex-grow flex justify-center">
+            <h1 class="text-xl font-primary font-bold">
+                @(UserService.IsLoggedIn 
+                    ? $"{UserService.CurrentUser!.Username.ToUpper()}'S TODOS"
+                    : "TODO APP")
+            </h1>
+        </div>
+        <button class="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-3 rounded-md transition-colors duration-200 text-sm">
+            +
+        </button>
+    </div>
+    <div class="w-1/5 flex justify-center items-center">
+        <button @onclick="ToggleUserModal" class="text-xl font-primary font-bold hover:text-blue-500 focus:outline-none">
+                @(UserService.IsLoggedIn 
+                    ? $"profile".ToUpper()
+                    : "login".ToUpper())
+        </button>
+    </div>
+</div>
+
+<LoginModal @bind-IsVisible="isLoginModalVisible" OnLoginSuccess="HandleLoginSuccess" />
+<UserProfileModal @bind-IsVisible="isProfileModalVisible" OnLogout="HandleLogout" />
+
+@code {
+    private bool isLoginModalVisible;
+    private bool isProfileModalVisible;
+
+    protected override void OnInitialized()
+    {
+        UserService.OnUserStateChanged += StateHasChanged;
+    }
+
+    private void ToggleUserModal()
+    {
+        if (UserService.IsLoggedIn)
+        {
+            isProfileModalVisible = true;
+        }
+        else
+        {
+            isLoginModalVisible = true;
+        }
+    }
+
+    private void HandleLoginSuccess()
+    {
+        isLoginModalVisible = false;
+        StateHasChanged();
+    }
+
+    private void HandleLogout()
+    {
+        isProfileModalVisible = false;
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        UserService.OnUserStateChanged -= StateHasChanged;
+    }
+}
