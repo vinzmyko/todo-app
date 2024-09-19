@@ -1,0 +1,26 @@
+﻿@inject UserService UserService
+@inject NavigationManager NavigationManager
+
+<CompositeModal @bind-IsVisible="IsVisible" Title="User Profile">
+    @if (UserService.CurrentUser != null)
+    {
+        <p>Welcome, @UserService.CurrentUser.Username!</p>
+        <p>Account created on: @UserService.CurrentUser.CreatedAt.ToShortDateString()</p>
+        <button @onclick="HandleLogout" class="mt-4 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+            Logout
+        </button>
+    }
+</CompositeModal>
+
+@code {
+    [Parameter] public bool IsVisible { get; set; }
+    [Parameter] public EventCallback<bool> IsVisibleChanged { get; set; }
+    [Parameter] public EventCallback OnLogout { get; set; }
+
+    private async Task HandleLogout()
+    {
+        UserService.Logout();
+        await IsVisibleChanged.InvokeAsync(false);
+        await OnLogout.InvokeAsync();
+    }
+}

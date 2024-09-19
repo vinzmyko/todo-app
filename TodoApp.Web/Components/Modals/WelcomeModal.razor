@@ -1,0 +1,32 @@
+﻿@inject UserService UserService
+
+<CompositeModal @bind-IsVisible="IsVisible" Title="Welcome to Todo App">
+    <div class="text-center">
+        <p class="text-gray-600 mb-6">Please log in to view and manage your todos.</p>
+        <button @onclick="OpenLoginModal" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+            Login
+        </button>
+    </div>
+</CompositeModal>
+
+<LoginModal @bind-IsVisible="isLoginModalVisible" OnLoginSuccess="HandleLoginSuccess" />
+
+@code {
+    [Parameter] public bool IsVisible { get; set; }
+    [Parameter] public EventCallback<bool> IsVisibleChanged { get; set; }
+    [Parameter] public EventCallback OnLoginSuccess { get; set; }
+
+    private bool isLoginModalVisible = false;
+
+    private async Task OpenLoginModal()
+    {
+        await IsVisibleChanged.InvokeAsync(false);
+        isLoginModalVisible = true;
+    }
+
+    private async Task HandleLoginSuccess()
+    {
+        isLoginModalVisible = false;
+        await OnLoginSuccess.InvokeAsync();
+    }
+}
