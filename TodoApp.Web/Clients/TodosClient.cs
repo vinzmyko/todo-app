@@ -34,6 +34,10 @@ public class TodosClient
     public async Task<TodoDto> CreateTodoAsync(CreateTodoDto todo)
     {
         todo.UserId = _userService.CurrentUser!.Id;
+        todo.UserTimeZone = TimeZoneInfo.Local.Id;
+        todo.UserTimeOffsetMinutes = (int)TimeZoneInfo.Local.GetUtcOffset(DateTime.Now).TotalMinutes;
+        todo.UserLocalTime = DateTime.Now;
+
         var response = await _httpClient.PostAsJsonAsync("todos", todo);
         response.EnsureSuccessStatusCode();
         return await response.Content.ReadFromJsonAsync<TodoDto>()
