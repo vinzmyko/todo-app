@@ -125,7 +125,6 @@ public class TodoStateService
         SelectedTimeframe = timeframe;
         await NotifyFilterChanged();
     }
-
     public async Task ToggleTagAsync(string tag)
     {
         _logger.LogInformation("ToggleTagAsync called with tag: {Tag}", tag);

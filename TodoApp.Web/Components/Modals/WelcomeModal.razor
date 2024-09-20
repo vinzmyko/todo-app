@@ -1,5 +1,7 @@
-﻿@inject UserService UserService
+﻿@* Some code is using it but not immediately visible *@
+@inject UserService UserService 
 
+@* Two-way connection with CompositeModal.IsVisible and this.IsVisible*@
 <CompositeModal @bind-IsVisible="IsVisible" Title="Welcome to Todo App">
     <div class="text-center">
         <p class="text-gray-600 mb-6">Please log in to view and manage your todos.</p>
