@@ -17,9 +17,9 @@
     </div>
 }
 
-@code {
+@code 
+{
     [Parameter] public bool IsVisible { get; set; }
-    @* Allows this component to notify it's parent that it wants to chagne its visibility *@
     @* EventCallback's allow child components to communication events up to their parents without knowing what the parent will do with that information *@
     @* EventCallback where the child notifies the parent of an event. *@
     [Parameter] public EventCallback<bool> IsVisibleChanged { get; set; }
@@ -28,6 +28,7 @@
 
     private Task Close()
     {
+        @* The argument is based on the type parameter "<bool>" *@
         return IsVisibleChanged.InvokeAsync(false); @* Telling the parent component that visibility should change to false meaning close modal.*@
     }
 }
