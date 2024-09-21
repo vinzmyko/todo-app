@@ -40,7 +40,6 @@
     private bool isCreateTodoModalVisible = false;
     private bool isTodoDetailModalVisible = false;
     private TodoDto? selectedTodo;
-
     protected override async Task OnInitializedAsync()
     {
         UserService.OnUserStateChanged += HandleUserStateChanged;
@@ -80,7 +79,6 @@
             Logger.LogError(ex, "Error fetching todo details");
         }
     }
-
     private async Task HandleTodoUpdated()
     {
         await RefreshTodos();
