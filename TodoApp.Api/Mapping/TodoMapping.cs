@@ -27,9 +27,11 @@ public static class TodoMapping
         {
             Title = todoDto.Title,
             Description = todoDto.Description,
-            DueDate = todoDto.DueDate,
+            DueDate = todoDto.DueDate.HasValue 
+                ? TimeZoneInfo.ConvertTimeToUtc(DateTime.SpecifyKind(todoDto.DueDate.Value, DateTimeKind.Unspecified), userTz)
+                : (DateTime?)null,
             User = user,
-            CreatedAt = TimeZoneInfo.ConvertTimeToUtc(todoDto.UserLocalTime, userTz)
+            CreatedAt = TimeZoneInfo.ConvertTimeToUtc(DateTime.SpecifyKind(todoDto.UserLocalTime, DateTimeKind.Unspecified), userTz)
         };
 
         foreach (var tag in tags)
