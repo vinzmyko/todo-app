@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace TodoApp.Web.Models;
 
@@ -13,7 +14,8 @@ public class TodoDto
     public DateTime? DueDate { get; set; }
     [Required] public required TimeFrame TodoTimeFrame { get; set; }
     [Required] public required int UserId { get; set; }
-    [Required] public required UserDto User { get; set; }
+    [JsonIgnore]
+     public UserDto? User { get; set; }
     public List<TagDto>? Tags { get; set; }
 }
 

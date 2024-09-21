@@ -1,4 +1,5 @@
-﻿using TodoApp.Web.Models;
+﻿using System.Text.Json;
+using TodoApp.Web.Models;
 using TodoApp.Web.Services;
 
 namespace TodoApp.Web.Clients;
@@ -7,11 +8,13 @@ public class TodosClient
 {
     private readonly HttpClient _httpClient;
     private readonly UserService _userService;
+    private readonly ILogger<TodosClient> _logger;
 
-    public TodosClient(HttpClient httpClient, UserService userService)
+    public TodosClient(HttpClient httpClient, UserService userService, ILogger<TodosClient> logger)
     {
         _httpClient = httpClient;
         _userService = userService;
+        _logger = logger;
     }
 
     // GET all todos for the current user (summary)
@@ -33,15 +36,54 @@ public class TodosClient
     // POST a new todo for the current user
     public async Task<TodoDto> CreateTodoAsync(CreateTodoDto todo)
     {
-        todo.UserId = _userService.CurrentUser!.Id;
-        todo.UserTimeZone = TimeZoneInfo.Local.Id;
-        todo.UserTimeOffsetMinutes = (int)TimeZoneInfo.Local.GetUtcOffset(DateTime.Now).TotalMinutes;
-        todo.UserLocalTime = DateTime.Now;
+        try
+        {
+            // Ensure the UserId is set
+            todo.UserId = _userService.CurrentUser!.Id;
 
-        var response = await _httpClient.PostAsJsonAsync("todos", todo);
-        response.EnsureSuccessStatusCode();
-        return await response.Content.ReadFromJsonAsync<TodoDto>()
-            ?? throw new Exception("Failed to create todo.");
+            // Ensure UserLocalTime is set with the correct Kind
+            todo.UserLocalTime = DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Unspecified);
+
+            // Set time zone information
+            todo.UserTimeZone = TimeZoneInfo.Local.Id;
+            todo.UserTimeOffsetMinutes = (int)TimeZoneInfo.Local.GetUtcOffset(DateTime.Now).TotalMinutes;
+
+            // If DueDate is set, ensure it's also Unspecified
+            if (todo.DueDate.HasValue)
+            {
+                todo.DueDate = DateTime.SpecifyKind(todo.DueDate.Value, DateTimeKind.Unspecified);
+            }
+
+            _logger.LogInformation("Sending CreateTodo request: {@Todo}", todo);
+
+            var response = await _httpClient.PostAsJsonAsync("todos", todo);
+            
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                _logger.LogError("Error creating todo. Status: {StatusCode}, Content: {ErrorContent}", response.StatusCode, errorContent);
+                throw new HttpRequestException($"Error creating todo. Status: {response.StatusCode}, Content: {errorContent}");
+            }
+
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
+
+            var createdTodo = await response.Content.ReadFromJsonAsync<TodoDto>(options);
+            if (createdTodo == null)
+            {
+                throw new Exception("Failed to deserialize the created todo.");
+            }
+
+            _logger.LogInformation("Todo created successfully: {@CreatedTodo}", createdTodo);
+            return createdTodo;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error in CreateTodoAsync");
+            throw;
+        }
     }
 
     // PUT (update) an existing todo
