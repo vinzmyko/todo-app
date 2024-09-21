@@ -1,17 +1,17 @@
 ﻿@inject TodoStateService TodoState
 
 <div class="mt-auto">
-    <h3 class="text-xl font-primary font-medium mb-2 uppercase">Views</h3>
+    <h3 class="text-[#123C69] text-xl font-primary font-medium mb-2 uppercase">Views</h3>
     <div class="flex flex-col space-y-2">
         @foreach (var view in new[] { "duedate", "completed", "overdue" })
         {
             <button
                 @onclick="@(() => OnViewToggled(view))"
-                class="flex items-center justify-between w-full cursor-pointer px-4 py-3 rounded-md text-sm font-medium transition-colors duration-200
+                class="font-accent uppercase flex items-center justify-between w-full cursor-pointer px-4 py-3 rounded-md text-sm font-medium transition-colors duration-200
                        focus:outline-none
                        @(TodoState.CurrentView == view
-                           ? "bg-blue-500 text-white hover:bg-blue-600" 
-                           : "bg-gray-200 text-gray-700 hover:bg-gray-300")">
+                           ? "bg-[#AC3B61] text-[#fff]" 
+                           : "bg-[#EEE2DC] text-[#123C69] hover:bg-[#C15B7B]")">
                 <span>@view</span>
                 @if (view == "duedate")
                 {

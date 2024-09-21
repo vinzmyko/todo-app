@@ -1,19 +1,19 @@
 ﻿@inject TodoStateService TodoState
 
 <div class="mb-6">
-    <h3 class="text-xl font-primary font-medium mb-2 uppercase">Timeframe</h3>
+    <h3 class="text-[#123C69] text-xl font-primary font-medium mb-2 uppercase">Timeframe</h3>
     <div class="flex flex-col space-y-2">
         @foreach (var timeframe in TodoState.TimeFrameCounts.Keys)
         {
             <button
                 @onclick="@(() => OnTimeframeChanged(timeframe))"
-                class="flex items-center justify-between w-full cursor-pointer px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200
+                class="uppercase font-accent flex items-center justify-between w-full cursor-pointer px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200
                        focus:outline-none
                        @(TodoState.SelectedTimeframe == timeframe 
-                           ? "bg-blue-500 text-white" 
-                           : "bg-gray-200 text-gray-700 hover:bg-gray-300")">
+                           ? "bg-[#AC3B61] text-[#fff]" 
+                           : "bg-[#EEE2DC] text-[#123C69] hover:bg-[#C15B7B]")">
                 <span>@timeframe</span>
-                <span class="bg-opacity-20 bg-black px-2 py-1 rounded-full text-xs inline-block text-center" style="min-width: 1.5rem;">
+                <span class="bg-opacity-10 bg-[#000] px-2 py-1 rounded-full text-xs inline-block text-center" style="min-width: 1.5rem;">
                     @TodoState.TimeFrameCounts[timeframe]
                 </span>
             </button>
