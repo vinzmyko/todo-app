@@ -1,6 +1,6 @@
 ﻿@using TodoApp.Web.Models
 
-<div class="bg-white shadow-md rounded-lg p-4 mb-4 relative">
+<div class="bg-white shadow-md rounded-lg p-4 mb-4 relative cursor-pointer" @onclick="OnClick">
     <div class="flex justify-between items-start">
         <h3 class="text-lg font-semibold mb-2">@Todo.Title</h3>
         @if (Todo.IsCompleted)
@@ -29,6 +29,11 @@
 </div>
 
 @code {
-    [Parameter]
-    public required TodoSummaryDto Todo { get; set; }
+    [Parameter] public required TodoSummaryDto Todo { get; set; }
+    [Parameter] public EventCallback<TodoSummaryDto> OnTodoClicked { get; set; }
+
+    private async Task OnClick()
+    {
+        await OnTodoClicked.InvokeAsync(Todo);
+    }
 }

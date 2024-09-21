@@ -1,0 +1,130 @@
+﻿@using TodoApp.Web.Models
+@inject TodosClient TodosClient
+@inject TagsClient TagsClient
+@inject ILogger<TodoDetailModal> Logger
+
+<CompositeLargeModal @bind-IsVisible="IsVisible" Title="Todo Details" OnClose="OnModalClosed">
+    @if (Todo != null)
+    {
+        <EditForm Model="@updateModel" OnValidSubmit="HandleSubmit">
+            <DataAnnotationsValidator />
+            
+            <div class="space-y-4">
+                <div>
+                    <label for="title" class="block text-sm font-medium text-gray-700">Title</label>
+                    <InputText id="title" @bind-Value="updateModel.Title" 
+                        autocomplete="off" spellcheck="false"
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" />
+                    <ValidationMessage For="@(() => updateModel.Title)" />
+                </div>
+
+                <div>
+                    <label for="description" class="block text-sm font-medium text-gray-700">Description</label>
+                    <InputTextArea id="description" @bind-Value="updateModel.Description" 
+                        autocomplete="off" spellcheck="false"
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" rows="3" />
+                    <ValidationMessage For="@(() => updateModel.Description)" />
+                </div>
+
+                <div>
+                    <label for="dueDate" class="block text-sm font-medium text-gray-700">Due Date</label>
+                    <InputDate id="dueDate" @bind-Value="updateModel.DueDate" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" />
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Is Completed</label>
+                    <InputCheckbox @bind-Value="updateModel.IsCompleted" />
+                </div>
+
+                <div>
+                    <label for="tags" class="block text-sm font-medium text-gray-700">Tags</label>
+                    <TagInput @bind-Tags="tags" />
+                </div>
+
+                <div class="flex justify-end space-x-2">
+                    <button type="button" class="px-4 py-2 text-sm font-medium text-white bg-red-500 border border-red-500 rounded-md shadow-sm hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500" @onclick="HandleDelete">
+                        Delete
+                    </button>
+                    <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        Update Todo
+                    </button>
+                </div>
+            </div>
+        </EditForm>
+    }
+</CompositeLargeModal>
+
+@code {
+    [Parameter] public bool IsVisible { get; set; }
+    [Parameter] public EventCallback<bool> IsVisibleChanged { get; set; }
+    [Parameter] public TodoDto? Todo { get; set; }
+    [Parameter] public EventCallback OnTodoUpdated { get; set; }
+    [Parameter] public EventCallback OnTodoDeleted { get; set; }
+
+    private UpdateTodoDto updateModel = new UpdateTodoDto
+    {
+        Title = "",
+        TodoTimeFrame = TimeFrame.Future // Default value, adjust as needed
+    };
+    private List<string> tags = new();
+
+    protected override void OnParametersSet()
+    {
+        if (Todo != null)
+        {
+            updateModel = new UpdateTodoDto
+            {
+                Id = Todo.Id,
+                Title = Todo.Title,
+                Description = Todo.Description ?? "",
+                IsCompleted = Todo.IsCompleted,
+                CompletedAt = Todo.CompletedAt,
+                DueDate = Todo.DueDate,
+                TodoTimeFrame = Todo.TodoTimeFrame,
+                TagIds = Todo.Tags?.Select(t => t.Id).ToList() ?? new List<int>()
+            };
+            tags = Todo.Tags?.Select(t => t.Name).ToList() ?? new List<string>();
+        }
+    }
+
+    private async Task HandleSubmit()
+    {
+        try
+        {
+            var allTags = await TagsClient.GetTagsAsync();
+            updateModel.TagIds = allTags.Where(t => tags.Contains(t.Name)).Select(t => t.Id).ToList();
+
+            Logger.LogInformation($"{updateModel.Title}'s IsComplete: {updateModel.IsCompleted}");
+            await TodosClient.UpdateTodoAsync(updateModel.Id, updateModel);
+
+            await OnTodoUpdated.InvokeAsync();
+            await OnModalClosed();
+        }
+        catch
+        {
+            Logger.LogInformation("Submite failed");
+        }
+    }
+
+    private async Task HandleDelete()
+    {
+        if (Todo != null)
+        {
+            try
+            {
+                await TodosClient.DeleteTodoAsync(Todo.Id);
+                await OnTodoDeleted.InvokeAsync();
+                await OnModalClosed();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error deleting todo: {ex.Message}");
+            }
+        }
+    }
+
+    private async Task OnModalClosed()
+    {
+        await IsVisibleChanged.InvokeAsync(false);
+    }
+}

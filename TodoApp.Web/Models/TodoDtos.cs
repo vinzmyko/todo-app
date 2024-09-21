@@ -21,7 +21,7 @@ public class TodoDto
 
 public class CreateTodoDto
 {
-    [Required] [StringLength(100, MinimumLength = 1)] public required string Title { get; set; }
+    [Required] [StringLength(100, MinimumLength = 5)] public required string Title { get; set; }
 
     [Required] [StringLength(1000)] public required string Description { get; set; }
 

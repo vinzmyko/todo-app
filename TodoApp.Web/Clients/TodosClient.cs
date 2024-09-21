@@ -27,7 +27,6 @@ public class TodosClient
         return await _httpClient.GetFromJsonAsync<TodoSummaryDto[]>($"todos/user/{_userService.CurrentUser!.Id}") ?? [];
     }
 
-
     // GET a specific todo (detailed)
     public async Task<TodoDto> GetTodoAsync(int id)
         => await _httpClient.GetFromJsonAsync<TodoDto>($"todos/{id}")

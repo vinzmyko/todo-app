@@ -23,13 +23,14 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             @foreach (var todo in filteredTodos)
             {
-                <TodoSummaryComponent Todo="todo" />
+                <TodoSummaryComponent Todo="todo" OnTodoClicked="HandleTodoClicked" />
             }
         </div>
     }
 </div>
 
 <WelcomeModal @bind-IsVisible="isWelcomeModalVisible" OnLoginSuccess="RefreshTodos" />
+<TodoDetailModal @bind-IsVisible="isTodoDetailModalVisible" Todo="selectedTodo" OnTodoUpdated="HandleTodoUpdated" OnTodoDeleted="HandleTodoDeleted" />
 
 @code 
 {
@@ -37,6 +38,8 @@
     private TodoSummaryDto[]? filteredTodos;
     private bool isWelcomeModalVisible = false;
     private bool isCreateTodoModalVisible = false;
+    private bool isTodoDetailModalVisible = false;
+    private TodoDto? selectedTodo;
 
     protected override async Task OnInitializedAsync()
     {
@@ -46,7 +49,6 @@
         TodoState.OnTodoCreated += HandleTodoCreated;
         await RefreshTodos();
     }
-
 
     private async Task RefreshTodos()
     {
@@ -63,6 +65,32 @@
             isWelcomeModalVisible = true;
         }
         StateHasChanged();
+    }
+
+    private async Task HandleTodoClicked(TodoSummaryDto todo)
+    {
+        try
+        {
+            selectedTodo = await TodosClient.GetTodoAsync(todo.Id);
+            Logger.LogInformation($"Clicked on {todo.Title}. IsCompleteProperty is {todo.IsCompleted} ");
+            isTodoDetailModalVisible = true;
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error fetching todo details");
+        }
+    }
+
+    private async Task HandleTodoUpdated()
+    {
+        await RefreshTodos();
+        isTodoDetailModalVisible = false;
+    }
+
+    private async Task HandleTodoDeleted()
+    {
+        await RefreshTodos();
+        isTodoDetailModalVisible = false;
     }
 
     private async Task HandleTodoCreated()
@@ -127,6 +155,7 @@
         StateHasChanged();
         return Task.CompletedTask;
     }
+
     public void Dispose()
     {
         UserService.OnUserStateChanged -= HandleUserStateChanged;
