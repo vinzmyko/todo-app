@@ -65,6 +65,7 @@ public static class TodoMapping
         todo.Description = updateDto.Description;
         todo.DueDate = updateDto.DueDate;
         todo.TodoTimeFrame = updateDto.TodoTimeFrame;
+        todo.IsCompleted = updateDto.IsCompleted;
 
         // Clear existing tags and add new ones
         todo.TodoTags.Clear();

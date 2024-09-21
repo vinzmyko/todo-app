@@ -6,6 +6,7 @@ namespace TodoApp.Api.Dtos.Todo;
 public record UpdateTodoDto(
     [Required][StringLength(100, MinimumLength = 1)] string Title,
     [Required][StringLength(1000)] string Description,
+    bool IsCompleted,
     DateTime? DueDate,
     [Required] Timeframe TodoTimeFrame,
     IEnumerable<int> TagIds,

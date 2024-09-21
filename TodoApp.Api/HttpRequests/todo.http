@@ -33,8 +33,9 @@ PUT {{baseUrl}}/todos/1
 Content-Type: application/json
 
 {
-    "title": "Updated: Test new todo",
+    "title": "I resetted the bot should work now",
     "description": "This todo has been updated via HTTP request",
+    "isCompleted": true,
     "dueDate": "2024-12-31T23:59:59Z",
     "tagIds": [1, 2, 3],
     "userTimeZone": "Europe/London",
