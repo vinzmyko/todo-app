@@ -6,46 +6,59 @@
 <CompositeLargeModal @bind-IsVisible="IsVisible" Title="Todo Details" OnClose="OnModalClosed">
     @if (Todo != null)
     {
-        <EditForm Model="@updateModel" OnValidSubmit="HandleSubmit">
+        <EditForm Model="@updateModel" OnValidSubmit="HandleSubmit" class="font-secondary">
             <DataAnnotationsValidator />
             
-            <div class="space-y-4">
+            @if (context.GetValidationMessages().Any())
+            {
+                <div class="font-secondary mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+                    <ValidationSummary />
+                </div>
+            }
+            
+            <div class="space-y-6 font-secondary">
                 <div>
-                    <label for="title" class="block text-sm font-medium text-gray-700">Title</label>
+                    <label for="title" class="block text-sm font-medium text-[#123C69]">Title</label>
                     <InputText id="title" @bind-Value="updateModel.Title" 
                         autocomplete="off" spellcheck="false"
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" />
-                    <ValidationMessage For="@(() => updateModel.Title)" />
+                        class="mt-1 block w-full rounded-md border-[#BAB2B5] shadow-sm focus:border-[#AC3B61] focus:ring focus:ring-[#AC3B61] focus:ring-opacity-50 transition-all duration-200" />
+                    <ValidationMessage For="@(() => updateModel.Title)" class="text-[#AC3B61] text-sm mt-1" />
                 </div>
 
                 <div>
-                    <label for="description" class="block text-sm font-medium text-gray-700">Description</label>
+                    <label for="description" class="block text-sm font-medium text-[#123C69]">Description</label>
                     <InputTextArea id="description" @bind-Value="updateModel.Description" 
                         autocomplete="off" spellcheck="false"
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" rows="3" />
-                    <ValidationMessage For="@(() => updateModel.Description)" />
+                        class="mt-1 block w-full rounded-md border-[#BAB2B5] shadow-sm focus:border-[#AC3B61] focus:ring focus:ring-[#AC3B61] focus:ring-opacity-50 transition-all duration-200" rows="3" />
+                    <ValidationMessage For="@(() => updateModel.Description)" class="text-[#AC3B61] text-sm mt-1" />
                 </div>
 
                 <div>
-                    <label for="dueDate" class="block text-sm font-medium text-gray-700">Due Date</label>
-                    <InputDate id="dueDate" @bind-Value="updateModel.DueDate" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" />
+                    <label for="dueDate" class="block text-sm font-medium text-[#123C69]">Due Date</label>
+                    <InputDate id="dueDate" @bind-Value="updateModel.DueDate" 
+                        class="mt-1 block w-full rounded-md border-[#BAB2B5] shadow-sm focus:border-[#AC3B61] focus:ring focus:ring-[#AC3B61] focus:ring-opacity-50 transition-all duration-200" />
+                </div>
+
+                <div class="flex items-center justify-between">
+                    <label for="isCompleted" class="text-sm font-medium text-[#123C69]">Is Completed</label>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" @bind="updateModel.IsCompleted" class="sr-only peer">
+                        <div class="w-11 h-6 bg-[#BAB2B5] rounded-full peer peer-focus:ring-4 peer-focus:ring-[#AC3B61] dark:peer-focus:ring-[#AC3B61] peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-[#AC3B61]"></div>
+                    </label>
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700">Is Completed</label>
-                    <InputCheckbox @bind-Value="updateModel.IsCompleted" />
-                </div>
-
-                <div>
-                    <label for="tags" class="block text-sm font-medium text-gray-700">Tags</label>
+                    <label for="tags" class="block text-sm font-medium text-[#123C69]">Tags</label>
                     <TagInput @bind-Tags="tags" />
                 </div>
 
-                <div class="flex justify-end space-x-2">
-                    <button type="button" class="px-4 py-2 text-sm font-medium text-white bg-red-500 border border-red-500 rounded-md shadow-sm hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500" @onclick="HandleDelete">
+                <div class="flex justify-end space-x-3">
+                    <button type="button" @onclick="HandleDelete"
+                        class="px-4 py-2 text-sm font-medium text-white bg-[#AC3B61] rounded-md shadow-sm hover:bg-[#C15B7B] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#AC3B61] transition-colors duration-200">
                         Delete
                     </button>
-                    <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    <button type="submit"
+                        class="px-4 py-2 text-sm font-medium text-white bg-[#123C69] rounded-md shadow-sm hover:bg-[#1A5491] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#123C69] transition-colors duration-200">
                         Update Todo
                     </button>
                 </div>

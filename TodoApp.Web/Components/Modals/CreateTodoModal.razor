@@ -11,12 +11,12 @@
         
         @if (context.GetValidationMessages().Any())
         {
-            <div class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+            <div class="font-secondary mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
                 <ValidationSummary />
             </div>
         }
 
-        <div class="space-y-6">
+        <div class="space-y-6 font-secondary">
             <div>
                 <label for="title" class="block text-sm font-medium text-gray-700">Title</label>
                 <InputText id="title" @bind-Value="todoModel.Title" 
@@ -45,7 +45,7 @@
             </div>
 
             <div class="flex justify-end">
-                <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-[#123C69] rounded-md shadow-sm hover:bg-[#1A5491] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#123C69] transition-colors duration-200">
                     Create Todo
                 </button>
             </div>

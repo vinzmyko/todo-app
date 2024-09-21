@@ -1,20 +1,19 @@
 ﻿@inject UserService UserService
 
 <CompositeModal @bind-IsVisible="IsVisible" Title="Login">
-    <EditForm Model="@loginModel" OnValidSubmit="HandleLogin">
+    <EditForm Model="@loginModel" OnValidSubmit="HandleLogin" class="font-secondary">
         <DataAnnotationsValidator />
-        <ValidationSummary />
+        <ValidationSummary class="text-[#AC3B61] mb-4" />
 
-        <div class="mb-4">
-            <label for="username" class="block text-gray-700 text-sm font-bold mb-2">Username</label>
-            @* @bind-Value="" (Used specifically for form inputs) when you type a value it automatically updates loginModel.Username *@
+        <div class="mb-6">
+            <label for="username" class="block text-[#123C69] text-sm font-bold mb-2">Username</label>
             <InputText id="username" @bind-Value="loginModel.Username" 
                 autocomplete="off" spellcheck="false"
-                class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
+                class="shadow appearance-none border border-[#BAB2B5] rounded w-full py-2 px-3 text-[#123C69] leading-tight focus:outline-none focus:border-[#AC3B61] focus:ring-1 focus:ring-[#AC3B61] transition-all duration-200" />
         </div>
 
         <div class="flex items-center justify-between">
-            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+            <button type="submit" class="bg-[#AC3B61] hover:bg-[#C15B7B] text-white font-bold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-[#AC3B61] focus:ring-opacity-50 transition-colors duration-200">
                 Login
             </button>
         </div>
