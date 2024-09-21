@@ -12,25 +12,30 @@
                     : "TODO APP")
             </h1>
         </div>
-        <button class="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-3 rounded-md transition-colors duration-200 text-sm">
-            +
-        </button>
+        @if (UserService.IsLoggedIn)
+        {
+            <button @onclick="OpenCreateTodoModal" class="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-3 rounded-md transition-colors duration-200 text-sm">
+                +
+            </button>
+        }
     </div>
     <div class="w-1/5 flex justify-center items-center">
         <button @onclick="ToggleUserModal" class="text-xl font-primary font-bold hover:text-blue-500 focus:outline-none">
-                @(UserService.IsLoggedIn 
-                    ? $"profile".ToUpper()
-                    : "login".ToUpper())
+            @(UserService.IsLoggedIn 
+                ? $"profile".ToUpper()
+                : "login".ToUpper())
         </button>
     </div>
 </div>
 
 <LoginModal @bind-IsVisible="isLoginModalVisible" OnLoginSuccess="HandleLoginSuccess" />
 <UserProfileModal @bind-IsVisible="isProfileModalVisible" OnLogout="HandleLogout" />
+<CreateTodoModal @bind-IsVisible="isCreateTodoModalVisible" OnTodoCreated="HandleTodoCreated" />
 
 @code {
     private bool isLoginModalVisible;
     private bool isProfileModalVisible;
+    private bool isCreateTodoModalVisible;
 
     protected override void OnInitialized()
     {
@@ -49,6 +54,11 @@
         }
     }
 
+    private void OpenCreateTodoModal()
+    {
+        isCreateTodoModalVisible = true;
+    }
+
     private void HandleLoginSuccess()
     {
         isLoginModalVisible = false;
@@ -58,6 +68,12 @@
     private void HandleLogout()
     {
         isProfileModalVisible = false;
+        StateHasChanged();
+    }
+
+    private void HandleTodoCreated()
+    {
+        // You might want to refresh the todo list or update some state here
         StateHasChanged();
     }
 

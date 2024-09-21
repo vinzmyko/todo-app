@@ -1,0 +1,140 @@
+﻿@using TodoApp.Web.Components.Todo
+@inject TodosClient TodosClient
+@inject TagsClient TagsClient
+@inject UserService UserService
+@inject TodoStateService TodoStateService
+@inject ILogger<CreateTodoModal> Logger
+
+<CompositeLargeModal @bind-IsVisible="IsVisible" Title="Create New Todo" OnClose="ResetModel">
+    <EditForm Model="@todoModel" OnValidSubmit="HandleSubmit">
+        <DataAnnotationsValidator />
+        
+        @if (context.GetValidationMessages().Any())
+        {
+            <div class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+                <ValidationSummary />
+            </div>
+        }
+
+        <div class="space-y-6">
+            <div>
+                <label for="title" class="block text-sm font-medium text-gray-700">Title</label>
+                <InputText id="title" @bind-Value="todoModel.Title" 
+                    autocomplete="off" spellcheck="false"
+                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" />
+                <ValidationMessage For="@(() => todoModel.Title)" class="text-red-500 text-sm mt-1" />
+            </div>
+
+            <div>
+                <label for="description" class="block text-sm font-medium text-gray-700">Description</label>
+                <InputTextArea id="description" @bind-Value="todoModel.Description" 
+                    autocomplete="off" spellcheck="false"
+                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" rows="3" />
+                <ValidationMessage For="@(() => todoModel.Description)" class="text-red-500 text-sm mt-1" />
+            </div>
+
+            <div>
+                <label for="dueDate" class="block text-sm font-medium text-gray-700">Due Date</label>
+                <InputDate id="dueDate" @bind-Value="todoModel.DueDate" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" />
+                <ValidationMessage For="@(() => todoModel.DueDate)" class="text-red-500 text-sm mt-1" />
+            </div>
+
+            <div>
+                <label for="tags" class="block text-sm font-medium text-gray-700">Tags</label>
+                <TagInput @bind-Tags="tags" />
+            </div>
+
+            <div class="flex justify-end">
+                <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    Create Todo
+                </button>
+            </div>
+        </div>
+    </EditForm>
+</CompositeLargeModal>
+
+@code {
+    [Parameter] public bool IsVisible { get; set; }
+    [Parameter] public EventCallback<bool> IsVisibleChanged { get; set; }
+    [Parameter] public EventCallback OnTodoCreated { get; set; }
+
+    private CreateTodoDto todoModel = new CreateTodoDto
+    {
+        Title = string.Empty,
+        Description = string.Empty,
+        DueDate = null,
+        UserId = 0,
+        TagIds = new List<int>(),
+        UserTimeZone = string.Empty,
+        UserTimeOffsetMinutes = 0,
+        UserLocalTime = DateTime.Now
+    };
+
+    private List<string> tags = new();
+
+    protected override void OnInitialized()
+    {
+        ResetModel();
+    }
+
+    private void ResetModel()
+    {
+        todoModel = new CreateTodoDto
+        {
+            Title = string.Empty,
+            Description = string.Empty,
+            DueDate = null,
+            UserId = UserService.CurrentUser?.Id ?? 0,
+            TagIds = new List<int>(),
+            UserTimeZone = string.Empty,
+            UserTimeOffsetMinutes = 0,
+            UserLocalTime = DateTime.Now
+        };
+        tags.Clear();
+    }
+
+    private async Task HandleSubmit()
+    {
+        try
+        {
+            Logger.LogInformation("HandleSubmit started");
+
+            // Validate required fields
+            if (string.IsNullOrWhiteSpace(todoModel.Title) || string.IsNullOrWhiteSpace(todoModel.Description))
+            {
+                Logger.LogWarning("Validation failed: Title or Description is empty");
+                return;
+            }
+
+            Logger.LogInformation("Creating new tags");
+            var existingTags = await TagsClient.GetTagsAsync();
+            var newTags = tags.Except(existingTags.Select(t => t.Name)).ToList();
+            foreach (var newTag in newTags)
+            {
+                await TagsClient.CreateTagAsync(new CreateTagDto { Name = newTag });
+            }
+
+            Logger.LogInformation("Getting all tag IDs");
+            var allTags = await TagsClient.GetTagsAsync();
+            todoModel.TagIds = allTags.Where(t => tags.Contains(t.Name)).Select(t => t.Id).ToList();
+
+            // Ensure all required fields are set
+            todoModel.UserId = UserService.CurrentUser!.Id;
+            todoModel.UserTimeZone = TimeZoneInfo.Local.Id;
+            todoModel.UserTimeOffsetMinutes = (int)TimeZoneInfo.Local.GetUtcOffset(DateTime.Now).TotalMinutes;
+            todoModel.UserLocalTime = DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Unspecified);
+
+            Logger.LogInformation("Calling TodosClient.CreateTodoAsync with model: {@TodoModel}", todoModel);
+            var createdTodo = await TodosClient.CreateTodoAsync(todoModel);
+
+            Logger.LogInformation("Todo created successfully: {@CreatedTodo}", createdTodo);
+            await IsVisibleChanged.InvokeAsync(false);
+            await TodoStateService.NotifyTodoCreatedAsync();
+            ResetModel();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error in HandleSubmit");
+        }
+    }
+}
