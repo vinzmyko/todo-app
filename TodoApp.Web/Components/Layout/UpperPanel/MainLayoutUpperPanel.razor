@@ -3,10 +3,10 @@
 @inject UserService UserService
 @implements IDisposable
 
-<div class="flex items-center justify-between bg-white shadow-sm h-16">
-    <div class="w-4/5 flex items-center justify-between pr-4">
+<div class="flex items-center justify-between bg-[#EEE2DC] shadow-md h-20 px-6">
+    <div class="w-4/5 flex items-center justify-between">
         <div class="flex-grow flex justify-center">
-            <h1 class="text-xl font-primary font-bold">
+            <h1 class="text-2xl font-primary font-medium text-[#123C69]">
                 @(UserService.IsLoggedIn 
                     ? $"{UserService.CurrentUser!.Username.ToUpper()}'S TODOS"
                     : "TODO APP")
@@ -14,16 +14,16 @@
         </div>
         @if (UserService.IsLoggedIn)
         {
-            <button @onclick="OpenCreateTodoModal" class="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-3 rounded-md transition-colors duration-200 text-sm">
+            <button @onclick="OpenCreateTodoModal" class="text-3xl bg-[#AC3B61] hover:bg-[#C15B7B] text-white font-accent font-semibold py-2 px-4 rounded-md transition-colors duration-200">
                 +
             </button>
         }
     </div>
     <div class="w-1/5 flex justify-center items-center">
-        <button @onclick="ToggleUserModal" class="text-xl font-primary font-bold hover:text-blue-500 focus:outline-none">
+        <button @onclick="ToggleUserModal" class="mt-2.5 text-lg font-accent font-semibold text-[#4056A1] hover:text-[#2E3F75] focus:outline-none transition-colors duration-200 border-b-2 border-transparent hover:border-[#4056A1]">
             @(UserService.IsLoggedIn 
-                ? $"profile".ToUpper()
-                : "login".ToUpper())
+                ? $"PROFILE"
+                : "LOGIN")
         </button>
     </div>
 </div>
