@@ -33,5 +33,7 @@
         await UserService.LoginAsync(loginModel.Username);
         await IsVisibleChanged.InvokeAsync(false);
         await OnLoginSuccess.InvokeAsync();
+
+        loginModel = new CreateUserDto { Username = string.Empty };
     }
 }
