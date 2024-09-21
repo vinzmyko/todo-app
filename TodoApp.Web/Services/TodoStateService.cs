@@ -21,6 +21,15 @@ public class TodoStateService
     public List<string> ActiveTags { get; private set; } = new();
     public string? CurrentView { get; private set; }
     public bool IsDueDateAscending { get; private set; } = true;
+    public event Func<Task>? OnTodoCreated;
+
+    public async Task NotifyTodoCreatedAsync()
+    {
+        if (OnTodoCreated != null)
+        {
+            await OnTodoCreated.Invoke();
+        }
+    }
 
     public void UpdateTodos(TodoSummaryDto[]? todos)
     {
@@ -82,7 +91,7 @@ public class TodoStateService
                     }
                     else
                     {
-        TagCounts[tag.Name]++;
+                        TagCounts[tag.Name]++;
                     }
                 }
             }

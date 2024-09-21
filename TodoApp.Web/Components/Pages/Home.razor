@@ -36,14 +36,17 @@
     private TodoSummaryDto[]? todos;
     private TodoSummaryDto[]? filteredTodos;
     private bool isWelcomeModalVisible = false;
+    private bool isCreateTodoModalVisible = false;
 
     protected override async Task OnInitializedAsync()
     {
         UserService.OnUserStateChanged += HandleUserStateChanged;
-        await RefreshTodos();
         TodoState.OnChange += StateHasChanged;
         TodoState.OnFilterChange += ApplyFilters;
+        TodoState.OnTodoCreated += HandleTodoCreated;
+        await RefreshTodos();
     }
+
 
     private async Task RefreshTodos()
     {
@@ -62,6 +65,10 @@
         StateHasChanged();
     }
 
+    private async Task HandleTodoCreated()
+    {
+        await RefreshTodos();
+    }
 
     private void ResetTodos()
     {
@@ -69,7 +76,6 @@
         filteredTodos = null;
         TodoState.UpdateTodos(null);
     }
-
 
     private async void HandleUserStateChanged()
     {
@@ -123,7 +129,9 @@
     }
     public void Dispose()
     {
+        UserService.OnUserStateChanged -= HandleUserStateChanged;
         TodoState.OnChange -= StateHasChanged;
         TodoState.OnFilterChange -= ApplyFilters;
+        TodoState.OnTodoCreated -= HandleTodoCreated;
     }
 }
