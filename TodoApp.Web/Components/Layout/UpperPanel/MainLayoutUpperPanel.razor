@@ -14,7 +14,7 @@
         </div>
         @if (UserService.IsLoggedIn)
         {
-            <button @onclick="OpenCreateTodoModal" class="text-3xl bg-[#AC3B61] hover:bg-[#C15B7B] text-white font-accent font-semibold py-2 px-4 rounded-md transition-colors duration-200">
+            <button @onclick="OpenCreateTodoModal" @onclick:stopPropagation="true" class="text-3xl bg-[#AC3B61] hover:bg-[#C15B7B] text-white font-accent font-semibold py-2 px-4 rounded-md transition-colors duration-200">
                 +
             </button>
         }
@@ -46,17 +46,19 @@
     {
         if (UserService.IsLoggedIn)
         {
-            isProfileModalVisible = true;
+            isProfileModalVisible = !isProfileModalVisible;
+            isCreateTodoModalVisible = false;
         }
         else
         {
-            isLoginModalVisible = true;
+            isLoginModalVisible = !isLoginModalVisible;
         }
     }
 
     private void OpenCreateTodoModal()
     {
         isCreateTodoModalVisible = true;
+        isProfileModalVisible = false;
     }
 
     private void HandleLoginSuccess()
@@ -73,7 +75,7 @@
 
     private void HandleTodoCreated()
     {
-        // You might want to refresh the todo list or update some state here
+        isCreateTodoModalVisible = false;
         StateHasChanged();
     }
 
