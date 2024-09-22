@@ -13,6 +13,9 @@
     </PackageReference>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.8" />
     <PackageReference Include="MinimalApis.Extensions" Version="0.11.0" />
+    <None Update="TodoApp.db">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
  </ItemGroup>
 
 </Project>
