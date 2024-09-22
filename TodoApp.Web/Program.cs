@@ -26,6 +26,7 @@ if (builder.Environment.IsDevelopment())
     builder.Configuration.AddUserSecrets<Program>();
 }
 
+// The following line will work for both User Secrets and Azure App Settings
 var todoAppApiUrl = builder.Configuration["ApiSettings:BaseUrl"];
 logger.LogInformation($"API URL from configuration: {todoAppApiUrl}");
 
@@ -39,23 +40,10 @@ if (string.IsNullOrEmpty(todoAppApiUrl))
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
-builder.Services.AddHttpClient<UsersClient>(client => 
-{
-    logger.LogInformation($"Configuring UsersHttpClient with BaseAddress: {todoAppApiUrl}");
-    client.BaseAddress = new Uri(todoAppApiUrl);
-});
-
-builder.Services.AddHttpClient<TagsClient>(client => 
-{
-    logger.LogInformation($"Configuring TagsHttpClient with BaseAddress: {todoAppApiUrl}");
-    client.BaseAddress = new Uri(todoAppApiUrl);
-});
-
-builder.Services.AddHttpClient<TodosClient>(client => 
-{
-    logger.LogInformation($"Configuring TagsHttpClient with BaseAddress: {todoAppApiUrl}");
-    client.BaseAddress = new Uri(todoAppApiUrl);
-});
+// Configure HttpClients
+ConfigureHttpClient<UsersClient>(builder, todoAppApiUrl, logger);
+ConfigureHttpClient<TagsClient>(builder, todoAppApiUrl, logger);
+ConfigureHttpClient<TodosClient>(builder, todoAppApiUrl, logger);
 
 builder.Services.AddScoped<TodoStateService>();
 builder.Services.AddScoped<UserService>();
@@ -84,3 +72,13 @@ app.MapRazorComponents<App>()
 logger.LogInformation("Application configured and ready to run");
 
 app.Run();
+
+// Helper method to configure HttpClient
+void ConfigureHttpClient<T>(WebApplicationBuilder builder, string baseUrl, ILogger logger) where T : class
+{
+    builder.Services.AddHttpClient<T>(client => 
+    {
+        logger.LogInformation($"Configuring {typeof(T).Name} with BaseAddress: {baseUrl}");
+        client.BaseAddress = new Uri(baseUrl);
+    });
+}
